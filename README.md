@@ -3,13 +3,14 @@
 Board-scoped Zephyr support modules for local product repositories.
 
 This repository keeps Zephyr dependency selection small and reproducible by
-splitting board support under `boards/<board>/`. It does not vendor Zephyr
-itself. The Zephyr workspace lives next to this repository at `../zephyrproject`.
+splitting board support under `boards/<board>/`. The local Zephyr workspace is
+managed inside this repository at `zephyrproject/`, but it is ignored by git.
 
 ## Layout
 
 ```text
 dephy/
+├── zephyrproject/        # ignored local Zephyr workspace
 └── boards/
     └── esp32/
         ├── deps.json
