@@ -1,10 +1,19 @@
 # dephy
 
-Board-scoped Zephyr support modules for local product repositories.
+Board-scoped Zephyr workspace and module profiles for product repositories.
 
-This repository keeps Zephyr dependency selection small and reproducible by
-splitting board support under `boards/<board>/`. The local Zephyr workspace is
-managed inside this repository at `zephyrproject/`, but it is ignored by git.
+`dephy` has two separate concepts:
+
+- **Dephy board profile**: a stable directory under `boards/`, such as
+  `boards/esp32`. Product `deps.json` files use this for `module_path` and for
+  running Dephy helper scripts.
+- **Zephyr board target**: the target passed to `west build`, such as
+  `esp32_devkitc/esp32/procpu`. This can change with Zephyr releases without
+  changing the Dephy profile directory name.
+
+The local Zephyr workspace is created at `zephyrproject/` inside the checked-out
+`dephy` repo. It is ignored by git, so a product that clones Dephy into
+`deps/dephy` should create/use `deps/dephy/zephyrproject`.
 
 ## Layout
 
@@ -13,7 +22,7 @@ dephy/
 ├── zephyrproject/        # ignored local Zephyr workspace
 └── boards/
     └── esp32/
-        ├── deps.json
+        ├── deps.json     # Zephyr modules and default Zephyr board target
         ├── scripts/
         │   └── sync_zephyr_modules.sh
         └── zephyr/
@@ -24,14 +33,20 @@ dephy/
 
 ## Usage
 
-Update only the Zephyr modules declared for ESP32:
+Update the Zephyr workspace and only the Zephyr modules declared for ESP32:
 
 ```bash
 ./boards/esp32/scripts/sync_zephyr_modules.sh
 ```
 
-Current initial release tag:
+The ESP32 profile currently defaults to this Zephyr target:
 
 ```text
-dephy-v0.1.0
+esp32_devkitc/esp32/procpu
+```
+
+Current release tag:
+
+```text
+dephy-v0.1.3
 ```
