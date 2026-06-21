@@ -1,4 +1,4 @@
-# zephyer
+# dephy
 
 Board-scoped Zephyr support modules for local product repositories.
 
@@ -9,7 +9,7 @@ itself. The Zephyr workspace lives next to this repository at `../zephyrproject`
 ## Layout
 
 ```text
-zephyer/
+dephy/
 └── boards/
     └── esp32/
         ├── deps.json
@@ -32,5 +32,5 @@ Update only the Zephyr modules declared for ESP32:
 Current initial release tag:
 
 ```text
-zephyer-v0.1.0
+dephy-v0.1.0
 ```
