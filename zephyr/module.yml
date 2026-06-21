@@ -1,0 +1,4 @@
+name: esp32_zephyer
+build:
+  cmake: zephyr
+  kconfig: zephyr/Kconfig
