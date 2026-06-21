@@ -48,5 +48,5 @@ esp32_devkitc/esp32/procpu
 Current release tag:
 
 ```text
-dephy-v0.1.3
+dephy-v0.1.4
 ```

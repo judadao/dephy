@@ -35,6 +35,10 @@ else
     WEST="$workspace/.venv/bin/west"
 fi
 
+if [ -x "$workspace/.venv/bin/pip" ]; then
+    "$workspace/.venv/bin/pip" install --quiet jsonschema pyelftools
+fi
+
 if [ ! -f "$workspace/.west/config" ]; then
     "$WEST" init "$workspace"
 fi
