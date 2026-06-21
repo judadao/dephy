@@ -1,35 +1,36 @@
-# esp32_zephyer
+# zephyer
 
-ESP32 Zephyr support module for local product repositories.
+Board-scoped Zephyr support modules for local product repositories.
 
-This repository keeps the ESP32-specific Zephyr dependency selection small and
-reproducible. It does not vendor Zephyr itself. The Zephyr workspace lives next
-to this repository at `../zephyrproject`, and `deps.json` lists the Zephyr
-modules that should be downloaded for ESP32 work.
+This repository keeps Zephyr dependency selection small and reproducible by
+splitting board support under `boards/<board>/`. It does not vendor Zephyr
+itself. The Zephyr workspace lives next to this repository at `../zephyrproject`.
 
 ## Layout
 
 ```text
-esp32_zephyer/
-├── deps.json
-├── scripts/
-│   └── sync_zephyr_modules.sh
-└── zephyr/
-    ├── CMakeLists.txt
-    ├── Kconfig
-    └── module.yml
+zephyer/
+└── boards/
+    └── esp32/
+        ├── deps.json
+        ├── scripts/
+        │   └── sync_zephyr_modules.sh
+        └── zephyr/
+            ├── CMakeLists.txt
+            ├── Kconfig
+            └── module.yml
 ```
 
 ## Usage
 
-Update only the Zephyr modules declared in `deps.json`:
+Update only the Zephyr modules declared for ESP32:
 
 ```bash
-./scripts/sync_zephyr_modules.sh
+./boards/esp32/scripts/sync_zephyr_modules.sh
 ```
 
 Current initial release tag:
 
 ```text
-esp32-zephyer-v0.1.0
+zephyer-v0.1.0
 ```

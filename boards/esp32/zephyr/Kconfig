@@ -1,0 +1,5 @@
+menuconfig ZEPHYER_ESP32
+    bool "Zephyer ESP32 support module"
+    default y
+    help
+      Enables the local Zephyer ESP32 support module.

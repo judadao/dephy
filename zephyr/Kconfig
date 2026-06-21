@@ -1,5 +1,0 @@
-menuconfig ESP32_ZEPHYER
-    bool "ESP32 Zephyr support module"
-    default y
-    help
-      Enables the local ESP32 Zephyr support module.

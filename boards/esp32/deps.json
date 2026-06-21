@@ -1,7 +1,7 @@
 {
   "zephyr": {
     "min_version": "v3.5.0",
-    "workspace": "../zephyrproject",
+    "workspace": "../../../zephyrproject",
     "modules": [
       "hal_espressif"
     ]
