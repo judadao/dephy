@@ -1,0 +1,7 @@
+{
+  "repo_type": "module",
+  "name": "dephy",
+  "module_kind": "board_platform",
+  "product_dependency_allowed": true
+}
+
