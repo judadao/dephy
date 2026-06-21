@@ -24,19 +24,19 @@ case "$workspace" in
     *) workspace=$(realpath -m "$ROOT_DIR/$workspace") ;;
 esac
 
-if command -v west >/dev/null 2>&1; then
-    WEST=$(command -v west)
-elif [ -x "$workspace/.venv/bin/west" ]; then
+if [ -x "$workspace/.venv/bin/west" ]; then
     WEST="$workspace/.venv/bin/west"
+elif command -v west >/dev/null 2>&1; then
+    WEST=$(command -v west)
 else
-    printf 'error: west not found; expected %s/.venv/bin/west or west in PATH\n' "$workspace" >&2
-    exit 1
+    mkdir -p "$workspace"
+    python3 -m venv "$workspace/.venv"
+    "$workspace/.venv/bin/pip" install --quiet west
+    WEST="$workspace/.venv/bin/west"
 fi
 
 if [ ! -f "$workspace/.west/config" ]; then
-    printf 'error: west workspace not found at %s\n' "$workspace" >&2
-    printf '  Run: %s init %s\n' "$WEST" "$workspace" >&2
-    exit 1
+    "$WEST" init "$workspace"
 fi
 
 if command -v jq >/dev/null 2>&1; then
