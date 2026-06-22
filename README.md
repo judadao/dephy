@@ -7,14 +7,20 @@ not each invent their own Zephyr workspace bootstrap, board module list, or
 board profile layout. They pin this repo, select a profile such as
 `boards/esp32`, and let the product stay focused on application behavior.
 
-## Why This Exists
+## Overview
+
+Use this repo when a product needs a known-good board profile and Zephyr module
+setup. The README covers the practical usage path; deeper structure notes live
+in `docs/` only after the normal flow is clear.
+
+## Key Value
 
 - One board profile can be reused by many products.
 - Zephyr module setup is validated before a product build starts.
 - Local development and CI use the same profile scripts.
 - Board-specific choices stay out of reusable protocol and IO modules.
 
-## Normal Flow
+## How To Use
 
 1. A product pins `dephy` in `deps.json`.
 2. The product sync script materializes it under `deps/dephy`.
