@@ -1,0 +1,29 @@
+version: 1
+policy:
+  source_of_truth: docs/todo.yaml
+  rules:
+  - Use dephy_todo as the global TODO entry point.
+  - Before starting work, add or update the relevant TODO item.
+  - When behavior changes, update TODO status in the same change.
+  - Keep docs/todo.md as a human-readable summary generated from this file.
+items:
+- id: todo-yaml-source
+  area: repo
+  title: Add docs/todo.yaml so the board platform repo is tracked globally.
+  status: done
+- id: align-golden-sample
+  area: repo
+  title: Align board-platform repository docs and scripts with the golden sample conventions.
+  status: todo
+- id: esp32-profile-smoke
+  area: validation
+  title: Add a smoke test for ESP32 board profile metadata and Zephyr module sync inputs.
+  status: todo
+- id: dependency-version-audit
+  area: release
+  title: Audit Dephy board-platform tags and document the version bump flow used by product deps.json files.
+  status: todo
+- id: zephyr-sync-performance
+  area: performance
+  title: Avoid redundant Zephyr module sync work when dependency pins have not changed.
+  status: todo
