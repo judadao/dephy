@@ -1,7 +1,7 @@
 {
   "repo_type": "module",
   "name": "dephy",
-  "description": "Reusable Dephy board-platform profiles and Zephyr workspace setup for ESP32 product repositories.",
+  "description": "Board-platform foundation for Dephy ESP32 products: Zephyr workspace setup, board profiles, and reusable hardware integration conventions.",
   "module_kind": "board_platform",
   "product_dependency_allowed": true,
   "license": "MIT",
@@ -11,6 +11,8 @@
     "zephyr",
     "esp32",
     "board-platform",
-    "embedded"
+    "embedded",
+    "embedded-c",
+    "hardware-abstraction"
   ]
 }
