@@ -4,16 +4,19 @@ Board-platform module for Dephy product repositories.
 
 ## Overview
 
-`dephy` provides reusable board profiles and Zephyr workspace setup. Product
-repos pin this module and select a profile such as `boards/esp32` instead of
-duplicating board bootstrap logic.
+`dephy` owns board profiles and Zephyr workspace setup. Product repos pin this
+module, select a profile such as `boards/esp32`, and reuse the same board sync
+logic locally and in CI.
 
 ## Key Value
 
-- Reusable board setup for multiple products.
-- Validated Zephyr module lists before product builds.
-- Consistent local and CI board profile commands.
-- Clear separation between board setup and product logic.
+- ESP32 profile metadata and Zephyr module list live in one reusable repo.
+- `sync_zephyr_modules.sh --check` validates inputs without network/workspace
+  mutation.
+- Normal sync caches a module-list signature and skips redundant `west update`
+  work when pins have not changed.
+- Product repos can pin `dephy-vX.Y.Z` tags and reference
+  `deps/dephy/boards/esp32`.
 
 ## How To Use
 
@@ -21,18 +24,40 @@ duplicating board bootstrap logic.
 boards/esp32/scripts/test_profile.sh
 boards/esp32/scripts/sync_zephyr_modules.sh --check
 boards/esp32/scripts/sync_zephyr_modules.sh
+DEPHY_FORCE_WEST_UPDATE=1 boards/esp32/scripts/sync_zephyr_modules.sh
 ```
 
-Product repos should pin a `dephy-vX.Y.Z` tag and reference a profile path such
-as `deps/dephy/boards/esp32`.
+## Architecture Flow
+
+```mermaid
+flowchart LR
+    Product[Product deps.json] --> Pin[Pin dephy tag]
+    Pin --> Profile[boards/esp32 profile]
+    Profile --> Check[test_profile + sync --check]
+    Profile --> West[Zephyr workspace]
+    West --> Modules[hal_espressif and required modules]
+    Modules --> Build[Product west build]
+```
+
+## Example User Scenario
+
+```mermaid
+flowchart TD
+    A[Product updates board dependency] --> B[Run sync_deps]
+    B --> C[Run ESP32 profile --check]
+    C --> D{Signature changed?}
+    D -->|no| E[Skip redundant west update]
+    D -->|yes| F[Run west update and cache signature]
+    E --> G[Build product]
+    F --> G
+```
 
 ## Simple Principle
 
-Product code owns application behavior. `dephy` owns board profile setup and
-Zephyr workspace assumptions. The ignored local workspace lives at
-`zephyrproject/`.
+Product code owns application behavior. `dephy` owns repeatable board profile
+setup and Zephyr workspace assumptions.
 
 ## Docs
 
-- `docs/module_structure.md`: board/profile structure.
+- `docs/module_structure.md`: board-platform profile structure and tag policy.
 - `docs/todo.md`: current TODO summary.
