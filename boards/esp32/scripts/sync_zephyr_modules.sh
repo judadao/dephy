@@ -3,6 +3,23 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 DEPS_JSON="$ROOT_DIR/deps.json"
+CHECK_ONLY=0
+
+case "${1:-}" in
+    --check)
+        CHECK_ONLY=1
+        ;;
+    --help|-h)
+        printf 'usage: %s [--check]\n' "$0"
+        exit 0
+        ;;
+    "")
+        ;;
+    *)
+        printf 'unknown argument: %s\n' "$1" >&2
+        exit 2
+        ;;
+esac
 
 json_value() {
     key=$1
@@ -24,6 +41,28 @@ case "$workspace" in
     *) workspace=$(realpath -m "$ROOT_DIR/$workspace") ;;
 esac
 
+if command -v jq >/dev/null 2>&1; then
+    modules=$(jq -r '.zephyr.modules[]? // empty' "$DEPS_JSON")
+else
+    modules="hal_espressif"
+fi
+
+board=$(json_value '.zephyr.board' || true)
+if [ -z "$board" ]; then
+    board=$(json_value '.build.board' || true)
+fi
+signature=$(printf '%s\n%s\n' "$board" "$modules" | sha256sum | awk '{print $1}')
+cache_dir="$workspace/.dephy"
+signature_file="$cache_dir/esp32.modules.sha256"
+
+if [ "$CHECK_ONLY" -eq 1 ]; then
+    printf 'workspace=%s\n' "$workspace"
+    printf 'board=%s\n' "$board"
+    printf 'modules=%s\n' "$modules"
+    printf 'signature=%s\n' "$signature"
+    exit 0
+fi
+
 if [ -x "$workspace/.venv/bin/west" ]; then
     WEST="$workspace/.venv/bin/west"
 elif command -v west >/dev/null 2>&1; then
@@ -41,12 +80,6 @@ fi
 
 if [ ! -f "$workspace/.west/config" ]; then
     "$WEST" init "$workspace"
-fi
-
-if command -v jq >/dev/null 2>&1; then
-    modules=$(jq -r '.zephyr.modules[]? // empty' "$DEPS_JSON")
-else
-    modules="hal_espressif"
 fi
 
 if [ -z "$modules" ]; then
@@ -74,11 +107,19 @@ for module in $modules; do
     fi
 done
 
-if [ -z "$missing_modules" ] && [ "${DEPHY_FORCE_WEST_UPDATE:-0}" != "1" ]; then
+if [ -z "$missing_modules" ] &&
+   [ "${DEPHY_FORCE_WEST_UPDATE:-0}" != "1" ] &&
+   [ -f "$signature_file" ] &&
+   [ "$(cat "$signature_file")" = "$signature" ]; then
+    printf 'Zephyr modules match cached signature; skipping west update.\n'
+elif [ -z "$missing_modules" ] && [ "${DEPHY_FORCE_WEST_UPDATE:-0}" != "1" ]; then
     printf 'Zephyr modules already present; set DEPHY_FORCE_WEST_UPDATE=1 to refresh.\n'
 else
     (cd "$workspace" && "$WEST" update ${missing_modules:-$modules})
 fi
+
+mkdir -p "$cache_dir"
+printf '%s\n' "$signature" > "$signature_file"
 
 if [ -f "$workspace/.west/config" ]; then
     if ! "$workspace/.venv/bin/python3" -c 'import esptool; raise SystemExit(0 if tuple(map(int, esptool.__version__.split(".")[:3])) >= (5, 0, 2) else 1)' >/dev/null 2>&1; then

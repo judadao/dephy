@@ -14,16 +14,23 @@ items:
 - id: align-golden-sample
   area: repo
   title: Align board-platform repository docs and scripts with the golden sample conventions.
-  status: todo
+  status: done
+  notes: Added AGENTS.md and docs/module_structure.md for board-platform layout.
 - id: esp32-profile-smoke
   area: validation
-  title: Add a smoke test for ESP32 board profile metadata and Zephyr module sync inputs.
-  status: todo
+  title: Add a smoke test for ESP32 board profile metadata and Zephyr module sync
+    inputs.
+  status: done
+  notes: Added boards/esp32/scripts/test_profile.sh and sync --check validation.
 - id: dependency-version-audit
   area: release
-  title: Audit Dephy board-platform tags and document the version bump flow used by product deps.json files.
-  status: todo
+  title: Audit Dephy board-platform tags and document the version bump flow used by
+    product deps.json files.
+  status: done
+  notes: Documented dephy-vX.Y.Z board-platform tag policy in docs/module_structure.md.
 - id: zephyr-sync-performance
   area: performance
   title: Avoid redundant Zephyr module sync work when dependency pins have not changed.
-  status: todo
+  status: done
+  notes: Added module-list signature cache and --check mode to skip redundant sync
+    work.
