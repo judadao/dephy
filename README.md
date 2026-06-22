@@ -1,59 +1,51 @@
 # dephy
 
-Board-scoped Zephyr workspace and module profiles for product repositories.
+Board-platform module for Dephy product repositories.
 
-`dephy` has two separate concepts:
+`dephy` owns board-scoped Zephyr workspace setup. Product repositories consume a
+profile such as `boards/esp32` through `deps.json`; reusable protocol, broker,
+IO, and product workflow code belongs in other repos.
 
-- **Dephy board profile**: a stable directory under `boards/`, such as
-  `boards/esp32`. Product `deps.json` files use this for `module_path` and for
-  running Dephy helper scripts.
-- **Zephyr board target**: the target passed to `west build`, such as
-  `esp32_devkitc/esp32/procpu`. This can change with Zephyr releases without
-  changing the Dephy profile directory name.
-
-The local Zephyr workspace is created at `zephyrproject/` inside the checked-out
-`dephy` repo. It is ignored by git, so a product that clones Dephy into
-`deps/dephy` should create/use `deps/dephy/zephyrproject`.
-
-## Layout
+## Current Shape
 
 ```text
 dephy/
-├── zephyrproject/        # ignored local Zephyr workspace
-└── boards/
-    └── esp32/
-        ├── deps.json     # Zephyr modules and default Zephyr board target
-        ├── scripts/
-        │   └── sync_zephyr_modules.sh
-        └── zephyr/
-            ├── CMakeLists.txt
-            ├── Kconfig
-            └── module.yml
+├── boards/esp32/
+│   ├── deps.json
+│   ├── scripts/
+│   │   ├── sync_zephyr_modules.sh
+│   │   └── test_profile.sh
+│   └── zephyr/
+│       ├── CMakeLists.txt
+│       ├── Kconfig
+│       └── module.yml
+├── docs/
+│   ├── module_structure.md
+│   ├── todo.md
+│   └── todo.yaml
+└── repo.json
 ```
 
-## Usage
+The local Zephyr workspace lives at `zephyrproject/` and is ignored by git.
 
-Update the Zephyr workspace and only the Zephyr modules declared for ESP32:
+## Commands
 
-```bash
-./boards/esp32/scripts/sync_zephyr_modules.sh
+```sh
+boards/esp32/scripts/test_profile.sh
+boards/esp32/scripts/sync_zephyr_modules.sh --check
+boards/esp32/scripts/sync_zephyr_modules.sh
 ```
 
-The first run initializes `zephyrproject/` and downloads the configured Zephyr
-modules. Later runs skip module downloads when the module checkout already
-exists. Set `DEPHY_FORCE_WEST_UPDATE=1` to refresh the modules explicitly.
+`--check` validates the profile and prints workspace, board, module list, and
+signature without initializing a Zephyr workspace. Normal sync uses a module
+signature cache and skips redundant work unless `DEPHY_FORCE_WEST_UPDATE=1` is
+set.
 
-The script also reports whether the matching Zephyr SDK is available at
-`$ZEPHYR_SDK_INSTALL_DIR` or `$HOME/zephyr-sdk-<SDK_VERSION>`.
+## Versioning
 
-The ESP32 profile currently defaults to this Zephyr target:
+Use `dephy-vX.Y.Z` tags. Product repos should pin a tag and reference profile
+paths through `module_path`, for example `deps/dephy/boards/esp32`.
 
-```text
-esp32_devkitc/esp32/procpu
-```
+## TODO
 
-Current release tag:
-
-```text
-dephy-v0.1.6
-```
+TODO state is tracked in `docs/todo.yaml` and summarized in `docs/todo.md`.
