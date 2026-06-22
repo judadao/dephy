@@ -2,31 +2,51 @@
 
 Board-platform module for Dephy product repositories.
 
-`dephy` owns board-scoped Zephyr workspace setup. Product repositories consume a
-profile such as `boards/esp32` through `deps.json`; reusable protocol, broker,
-IO, and product workflow code belongs in other repos.
+`dephy` is the place where board setup is made repeatable. Product repos should
+not each invent their own Zephyr workspace bootstrap, board module list, or
+board profile layout. They pin this repo, select a profile such as
+`boards/esp32`, and let the product stay focused on application behavior.
 
-## Current Shape
+## Why This Exists
+
+- One board profile can be reused by many products.
+- Zephyr module setup is validated before a product build starts.
+- Local development and CI use the same profile scripts.
+- Board-specific choices stay out of reusable protocol and IO modules.
+
+## Normal Flow
+
+1. A product pins `dephy` in `deps.json`.
+2. The product sync script materializes it under `deps/dephy`.
+3. The product build points at a profile path such as
+   `deps/dephy/boards/esp32`.
+4. The profile validates board metadata, Zephyr module lists, and workspace
+   assumptions.
+5. Product code includes reusable modules through Zephyr, while board setup
+   remains owned here.
+
+## How It Works
+
+The ESP32 profile has two responsibilities:
+
+- `sync_zephyr_modules.sh` checks or syncs the local Zephyr workspace module
+  list. It uses a module signature cache, so repeated runs skip redundant work
+  unless `DEPHY_FORCE_WEST_UPDATE=1` is set.
+- `test_profile.sh` validates the profile without needing to build a full
+  product. This catches missing module metadata and broken profile layout early.
+
+The local Zephyr workspace lives at `zephyrproject/` and is intentionally not
+committed.
+
+## Layout
 
 ```text
-dephy/
-├── boards/esp32/
-│   ├── deps.json
-│   ├── scripts/
-│   │   ├── sync_zephyr_modules.sh
-│   │   └── test_profile.sh
-│   └── zephyr/
-│       ├── CMakeLists.txt
-│       ├── Kconfig
-│       └── module.yml
-├── docs/
-│   ├── module_structure.md
-│   ├── todo.md
-│   └── todo.yaml
-└── repo.json
+boards/esp32/          ESP32 board profile consumed by products
+boards/esp32/scripts/  profile validation and Zephyr module sync
+boards/esp32/zephyr/   Zephyr module metadata for the profile
+docs/                  structure docs and TODO state
+repo.json              repository type metadata
 ```
-
-The local Zephyr workspace lives at `zephyrproject/` and is ignored by git.
 
 ## Commands
 
@@ -36,10 +56,8 @@ boards/esp32/scripts/sync_zephyr_modules.sh --check
 boards/esp32/scripts/sync_zephyr_modules.sh
 ```
 
-`--check` validates the profile and prints workspace, board, module list, and
-signature without initializing a Zephyr workspace. Normal sync uses a module
-signature cache and skips redundant work unless `DEPHY_FORCE_WEST_UPDATE=1` is
-set.
+Use `--check` in CI or during quick audits. Run the full sync when creating or
+refreshing the local Zephyr workspace.
 
 ## Versioning
 
