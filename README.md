@@ -27,6 +27,10 @@ boards/esp32/scripts/sync_zephyr_modules.sh
 DEPHY_FORCE_WEST_UPDATE=1 boards/esp32/scripts/sync_zephyr_modules.sh
 ```
 
+ESP32 product configuration fragments live under `boards/esp32/conf/`.
+`conf/product_slim.conf` is for Ethernet/MQTT field products that need Zephyr
+networking but do not need POSIX compatibility or verbose runtime logging.
+
 ## Architecture Flow
 
 ```mermaid
