@@ -61,6 +61,22 @@ flowchart TD
 Product code owns application behavior. `dephy` owns repeatable board profile
 setup and Zephyr workspace assumptions.
 
+## Systematic Regression Testing
+
+From the workspace root, run the shared pytest regression module:
+
+```sh
+../dephy_testkit/.venv/bin/python -m pytest ../dephy_testkit/tests/regression --module dephy
+../dephy_testkit/.venv/bin/python -m pytest ../dephy_testkit/tests/regression --module dephy --profile integration
+```
+
+The local repo smoke check remains:
+
+```sh
+boards/esp32/scripts/test_profile.sh
+boards/esp32/scripts/sync_zephyr_modules.sh --check
+```
+
 ## Docs
 
 - `docs/module_structure.md`: board-platform profile structure and tag policy.
