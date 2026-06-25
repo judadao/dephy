@@ -135,6 +135,22 @@ if [ -d "$workspace/modules/hal/espressif" ]; then
     fi
 fi
 
+patch_dir="$ROOT_DIR/patches/zephyr"
+if [ -d "$patch_dir" ] && [ -d "$workspace/zephyr/.git" ]; then
+    for patch in "$patch_dir"/*.patch; do
+        [ -e "$patch" ] || continue
+        if (cd "$workspace/zephyr" && git apply --reverse --check "$patch") >/dev/null 2>&1; then
+            printf 'Zephyr patch already applied: %s\n' "$(basename "$patch")"
+        elif (cd "$workspace/zephyr" && git apply --check "$patch") >/dev/null 2>&1; then
+            (cd "$workspace/zephyr" && git apply "$patch")
+            printf 'Applied Zephyr patch: %s\n' "$(basename "$patch")"
+        else
+            printf 'error: Zephyr patch cannot be applied: %s\n' "$patch" >&2
+            exit 1
+        fi
+    done
+fi
+
 sdk_version_file="$workspace/zephyr/SDK_VERSION"
 if [ -f "$sdk_version_file" ]; then
     sdk_version=$(cat "$sdk_version_file")

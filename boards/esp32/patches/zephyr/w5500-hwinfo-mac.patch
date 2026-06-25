@@ -1,0 +1,56 @@
+diff --git a/drivers/ethernet/eth_w5500.c b/drivers/ethernet/eth_w5500.c
+index 34eacadd08d..598639b66a1 100644
+--- a/drivers/ethernet/eth_w5500.c
++++ b/drivers/ethernet/eth_w5500.c
+@@ -16,6 +16,7 @@ LOG_MODULE_REGISTER(eth_w5500, CONFIG_ETHERNET_LOG_LEVEL);
+ #include <string.h>
+ #include <errno.h>
+ #include <zephyr/drivers/gpio.h>
++#include <zephyr/drivers/hwinfo.h>
+ #include <zephyr/drivers/spi.h>
+ #include <zephyr/net/net_pkt.h>
+ #include <zephyr/net/net_if.h>
+@@ -596,6 +597,35 @@ static void w5500_set_macaddr(const struct device *dev)
+ 	w5500_spi_write(dev, W5500_SHAR, ctx->mac_addr, sizeof(ctx->mac_addr));
+ }
+ 
++static void w5500_apply_hwinfo_mac(const struct device *dev)
++{
++	struct w5500_runtime *ctx = dev->data;
++	uint8_t device_id[8];
++	ssize_t len;
++
++	if (!IS_ENABLED(CONFIG_HWINFO)) {
++		return;
++	}
++
++	len = hwinfo_get_device_id(device_id, sizeof(device_id));
++	if (len < 6) {
++		LOG_WRN("%s: hardware device id unavailable; keeping configured MAC",
++			dev->name);
++		return;
++	}
++
++	ctx->mac_addr[0] = 0x02;
++	ctx->mac_addr[1] = 0x00;
++	ctx->mac_addr[2] = 0x00;
++	ctx->mac_addr[3] = device_id[(size_t)len - 3];
++	ctx->mac_addr[4] = device_id[(size_t)len - 2];
++	ctx->mac_addr[5] = device_id[(size_t)len - 1];
++	LOG_INF("%s: hardware-id MAC %02x:%02x:%02x:%02x:%02x:%02x",
++		dev->name,
++		ctx->mac_addr[0], ctx->mac_addr[1], ctx->mac_addr[2],
++		ctx->mac_addr[3], ctx->mac_addr[4], ctx->mac_addr[5]);
++}
++
+ static void w5500_memory_configure(const struct device *dev)
+ {
+ 	int i;
+@@ -688,6 +718,7 @@ static int w5500_init(const struct device *dev)
+ 	}
+ 
+ 	(void)net_eth_mac_load(&config->mac_cfg, ctx->mac_addr);
++	w5500_apply_hwinfo_mac(dev);
+ 	w5500_set_macaddr(dev);
+ 	w5500_memory_configure(dev);
+ 
