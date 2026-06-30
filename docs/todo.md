@@ -2,6 +2,10 @@
 
 Source of truth: `docs/todo.yaml`. Update YAML before starting or completing work.
 
+## hardware
+
+- [x] Package the ESP32 W5500 unique-MAC Zephyr patch release.
+
 ## repo
 
 - [x] Add docs/todo.yaml so the board platform repo is tracked globally.

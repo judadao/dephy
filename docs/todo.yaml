@@ -9,21 +9,16 @@ policy:
 items:
 - id: esp32-w5500-zephyr-driver-release
   area: hardware
-  title: Package W5500 Ethernet driver fixes as an ESP32 dephy Zephyr patch release.
-  status: in_progress
-  notes: Added on 2026-06-30. The product app needs W5500 fixes to be carried by
-    dephy's boards/esp32/patches/zephyr flow so other repos receive them through
-    sync_zephyr_modules.sh after pinning a new dephy-v tag. Current candidate
-    changes include polling RX drain, RX ring release for ignored frames, clearing
-    S0_IR_RECV after RECV, TX semaphore reset/timeout handling, padding TX frames
-    to the Ethernet 60-byte minimum, and using the MACRAW SEND command instead of
-    UDP-only SEND_MAC. USB0 testing confirmed ESP-to-host TX by observing 0x88b5
-    broadcasts from 02:00:00:60:37:28, but host-to-W5500 ARP/IP frames did not
-    trigger RX marker diagnostics and ping/HTTP still timed out. A forced 10M/full
-    PHY experiment did not recover RX. Do not tag this as a release until the
-    hardware path is rechecked with a different switch port/cable or direct link
-    and USB0 passes arping, ping, and HTTP curl from 192.168.127.5 to
-    192.168.127.10.
+  title: Package the ESP32 W5500 unique-MAC Zephyr patch release.
+  status: done
+  notes: The only W5500 driver change retained for release is
+    boards/esp32/patches/zephyr/w5500-hwinfo-mac.patch, which derives a locally
+    administered MAC from ESP32 hwinfo so multiple W5500 boards do not share
+    Zephyr's default fixed MAC. USB0 was validated with the minimal patch on
+    2026-06-30: ARP replied as 02:00:00:60:37:28, /status returned HTTP 200,
+    and / returned the full provisioning page. Broader experimental RX/TX, reset,
+    MACRAW filtering, and debug-log changes were discarded because baseline web
+    behavior passed once product IP conflicts and build configuration were fixed.
 - id: todo-yaml-source
   area: repo
   title: Add docs/todo.yaml so the board platform repo is tracked globally.
