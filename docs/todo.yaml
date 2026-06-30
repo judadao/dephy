@@ -7,6 +7,18 @@ policy:
   - When behavior changes, update TODO status in the same change.
   - Keep docs/todo.md as a human-readable summary generated from this file.
 items:
+- id: esp32-w5500-zephyr-driver-release
+  area: hardware
+  title: Package W5500 Ethernet driver fixes as an ESP32 dephy Zephyr patch release.
+  status: in_progress
+  notes: Added on 2026-06-30. The product app needs W5500 fixes to be carried by
+    dephy's boards/esp32/patches/zephyr flow so other repos receive them through
+    sync_zephyr_modules.sh after pinning a new dephy-v tag. Current candidate
+    changes include polling RX drain, RX ring release for ignored frames, clearing
+    S0_IR_RECV after RECV, TX semaphore reset/timeout handling, and padding TX
+    frames to the Ethernet 60-byte minimum. Do not tag this as a release until
+    USB0 hardware passes arping, ping, and HTTP curl from 192.168.127.5 to
+    192.168.127.10.
 - id: todo-yaml-source
   area: repo
   title: Add docs/todo.yaml so the board platform repo is tracked globally.
